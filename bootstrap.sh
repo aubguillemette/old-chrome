@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Based on: http://www.richud.com/wiki/Ubuntu_Fluxbox_GUI_with_x11vnc_and_Xvfb
+# Original script awinabi, modified to add a function to launch Chrome
 
 readonly G_LOG_I='[INFO]'
 readonly G_LOG_W='[WARN]'
@@ -9,6 +10,7 @@ readonly G_LOG_E='[ERROR]'
 main() {
     launch_xvfb
     launch_window_manager
+    launch_chrome
     run_vnc_server
 }
 
@@ -50,6 +52,10 @@ launch_window_manager() {
             exit 1
         fi
     done
+}
+
+launch_chrome() {
+    bash /home/chrome-user/run-chromium.sh &
 }
 
 run_vnc_server() {

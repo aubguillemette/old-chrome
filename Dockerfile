@@ -1,30 +1,29 @@
-FROM ubuntu:bionic
+FROM debian:latest
 
-RUN apt-get update; apt-get clean
+# Obligatory update
+RUN apt-get update
 
-# Add a user for running applications.
-RUN useradd apps
-RUN mkdir -p /home/apps && chown apps:apps /home/apps
+# Install VNC and X11
+RUN apt-get install x11vnc -y
+RUN apt-get install xvfb -y
+RUN apt-get install fluxbox -y
+RUN apt-get install wmctrl -y
 
-# Install x11vnc.
-RUN apt-get install -y x11vnc
+# Add user for chrome
+RUN useradd -m chrome-user
+WORKDIR /home/chrome-user
 
-# Install xvfb.
-RUN apt-get install -y xvfb
+# Copy and run installation script
+COPY get-chromium.sh .
+RUN ["bash", "-e", "./get-chromium.sh"]
 
-# Install fluxbox.
-RUN apt-get install -y fluxbox
+# Set user and environment variables
+USER chrome-user
+WORKDIR /home/chrome-user
 
-# Install wget.
-RUN apt-get install -y wget
+# Copy scripts
+COPY run-chromium.sh .
+COPY bootstrap.sh .
 
-# Install wmctrl.
-RUN apt-get install -y wmctrl
-
-COPY *.deb /
-RUN apt-get -y install ./chrome64_60.0.3112.90.deb
-
-COPY bootstrap.sh /
-RUN chmod a+x ./bootstrap.sh
-
-CMD '/bootstrap.sh'
+# Run bootstrap script
+CMD ["bash", "./bootstrap.sh"]
